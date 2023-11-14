@@ -1,21 +1,24 @@
 #include "Maze.h"
 
-Maze::Maze(int Width, int Height)
+Maze::Maze(int Width, int Height, int D)
 {
     // Dimensiones
-    width = Width;
-    height = Height;
+    width = Width - 100;
+    height = Height - 100;
 
     // Creando la Pantalla
     mWindow.create(sf::VideoMode(Width, Height, 32), "Maze");
 
-    // Llenando el vector de celdas
-    myCells = new Maze::Cell **[SIZE];
+    // Dificultad
+    dificulty = D;
 
-    for (int i = 0; i < SIZE; i++)
+    // Llenando el vector de celdas
+    myCells = new Maze::Cell **[dificulty];
+
+    for (int i = 0; i < dificulty; i++)
     {
-        myCells[i] = new Cell *[SIZE];
-        for (int j = 0; j < SIZE; j++)
+        myCells[i] = new Cell *[dificulty];
+        for (int j = 0; j < dificulty; j++)
         {
             myCells[i][j] = new Cell(j, i);
         }
@@ -90,14 +93,14 @@ void Maze::render()
 
 void Maze::Draw()
 {
-    int cellWidth = WIDTH / SIZE;
-    int cellHeight = HEIGHT / SIZE;
+    int cellWidth = width / dificulty;
+    int cellHeight = height / dificulty;
     int tempX, tempY;
-    int borderWidth = 3;
+    int borderWidth = (3 * 10) / dificulty;
 
-    for (int y = 0; y < SIZE; y++)
+    for (int y = 0; y < dificulty; y++)
     {
-        for (int x = 0; x < SIZE; x++)
+        for (int x = 0; x < dificulty; x++)
         {
             // Pone las pocisiones en x & y de el rectángulo, luego checa si ya fue visitado, si ya fue visitado, lo pinta de un color diferente
             tempX = (x * cellWidth);
@@ -160,7 +163,7 @@ Maze::Cell *Maze::getRandomNeighbor(int x, int y)
 
     std::vector<Maze::Cell *> neighbors;
 
-    if (y - 1 >= 0 && y - 1 < SIZE)
+    if (y - 1 >= 0 && y - 1 < dificulty)
     {
         Maze::Cell *top = myCells[y - 1][x];
 
@@ -170,7 +173,7 @@ Maze::Cell *Maze::getRandomNeighbor(int x, int y)
         }
     }
 
-    if (y + 1 < SIZE && y + 1 >= 0)
+    if (y + 1 < dificulty && y + 1 >= 0)
     {
         Maze::Cell *bottom = myCells[y + 1][x];
         if (!bottom->visited)
@@ -179,7 +182,7 @@ Maze::Cell *Maze::getRandomNeighbor(int x, int y)
         }
     }
 
-    if (x + 1 < SIZE && x + 1 >= 0)
+    if (x + 1 < dificulty && x + 1 >= 0)
     {
         Maze::Cell *right = myCells[y][x + 1];
         if (!right->visited)
@@ -188,7 +191,7 @@ Maze::Cell *Maze::getRandomNeighbor(int x, int y)
         }
     }
 
-    if (x - 1 < SIZE && x - 1 >= 0)
+    if (x - 1 < dificulty && x - 1 >= 0)
     {
         Maze::Cell *left = myCells[y][x - 1];
 

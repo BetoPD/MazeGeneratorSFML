@@ -7,15 +7,15 @@
 #include <vector>
 #include <limits>
 
-#define WIDTH 400
-#define HEIGHT 400
-#define SIZE 10
+// #define WIDTH 400
+// #define HEIGHT 400
+// #define SIZE 10
 
 class Maze
 {
 
 public:
-    Maze(int, int);
+    Maze(int, int, int);
     void Run();
 
 private:
@@ -67,4 +67,5 @@ private:
     sf::RenderWindow mWindow;
     Maze::Cell ***myCells;
     int width, height;
+    int dificulty;
 };

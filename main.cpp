@@ -4,7 +4,7 @@
 
 int main()
 {
-    Maze myMaze(500, 500);
+    Maze myMaze(500, 500, 30);
     myMaze.Run();
 
 
