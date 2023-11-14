@@ -1,13 +1,13 @@
 #include "Maze.h"
 
-Maze::Maze(int Width, int Height, int D)
+Maze::Maze(int Width, int Height, int D, int seed)
 {
     // Dimensiones
     width = Width - 100;
     height = Height - 100;
 
     // Creando la Pantalla
-    mWindow.create(sf::VideoMode(Width, Height, 32), "Maze");
+    mWindow.create(sf::VideoMode(Width, Height, 32), "Laberinto");
 
     // Dificultad
     dificulty = D;
@@ -25,7 +25,7 @@ Maze::Maze(int Width, int Height, int D)
     }
 
     // Random Seed
-    std::srand(9);
+    std::srand(seed);
 }
 
 void Maze::Run()
@@ -82,6 +82,8 @@ void Maze::update()
             pila.pop();
         }
     }
+
+    AStarAlgorithm(myCells[0][0], myCells[dificulty - 1][dificulty - 1]);
 }
 
 void Maze::render()
@@ -96,7 +98,8 @@ void Maze::Draw()
     int cellWidth = width / dificulty;
     int cellHeight = height / dificulty;
     int tempX, tempY;
-    int borderWidth = (3 * 10) / dificulty;
+    int borderWidth = ((3 * 10) / dificulty) * width / 400;
+    borderWidth = borderWidth > 1 ? borderWidth : 1;
 
     for (int y = 0; y < dificulty; y++)
     {
@@ -156,6 +159,19 @@ void Maze::Draw()
             }
         }
     }
+
+    // Dibujar el camino de A* Star
+
+    Maze::Cell *caminito = myCells[dificulty - 1][dificulty - 1];
+
+    while (caminito->parent != NULL)
+    {
+        caminito->rectangle.setFillColor(sf::Color::Red);
+        caminito->SetDimentions(cellWidth / 4, cellHeight / 4);
+        caminito->SetPosition(caminito->rectangle.getPosition().x + cellWidth / 2, caminito->rectangle.getPosition().y + cellHeight / 2);
+        mWindow.draw(caminito->rectangle);
+        caminito = caminito->parent;
+    }
 }
 
 Maze::Cell *Maze::getRandomNeighbor(int x, int y)
@@ -211,21 +227,12 @@ Maze::Cell *Maze::getRandomNeighbor(int x, int y)
     return NULL;
 }
 
-void Maze::AStarAlgorith(Maze::Cell *start, Maze::Cell *goal)
-{
-    start->g_score = 0;
-    start->f_score = ManhattanDistance(start->x, goal->x, start->y, goal->y);
-}
-
-int Maze::ManhattanDistance(int x1, int x2, int y1, int y2)
-{
-    int distanceX = std::abs(x2 - x1);
-    int distanceY = std::abs(y2 - y1);
-    return distanceX + distanceY;
-}
-
 void Maze::RemoveWalls(Maze::Cell *current, Maze::Cell *next, int deltaX, int deltaY)
 {
+
+    current->neighborsAStar.push_back(next);
+    next->neighborsAStar.push_back(current);
+
     if (deltaX == -1)
     {
         current->neighbors["left"] = true;
@@ -249,5 +256,106 @@ void Maze::RemoveWalls(Maze::Cell *current, Maze::Cell *next, int deltaX, int de
         current->neighbors["bottom"] = true;
         next->neighbors["top"] = true;
         return;
+    }
+}
+
+void Maze::AStarAlgorithm(Maze::Cell *start, Maze::Cell *goal)
+{
+
+    start->fLocalGoal = 0;
+    start->fGlobalGoal = ManhattanDistance(start->x, goal->x, start->y, goal->y);
+
+    std::vector<Maze::Cell *> listNotTestedNodes;
+    listNotTestedNodes.push_back(start);
+
+    Maze::Cell *current = NULL;
+
+    while (!listNotTestedNodes.empty())
+    {
+
+        Maze::Cell *aux = NULL;
+
+        bool swapped;
+
+        for (int i = 0; i < listNotTestedNodes.size() - 1; i++)
+        {
+            swapped = false;
+
+            for (int j = 0; j < listNotTestedNodes.size() - i - 1; j++)
+            {
+                if (listNotTestedNodes[j]->fGlobalGoal < listNotTestedNodes[j + 1]->fGlobalGoal)
+                {
+                    aux = listNotTestedNodes[j + 1];
+                    listNotTestedNodes[j + 1] = listNotTestedNodes[j];
+                    listNotTestedNodes[j] = aux;
+                    swapped = true;
+                }
+            }
+
+            if (!swapped)
+            {
+                break;
+            }
+        }
+
+        while (!listNotTestedNodes.empty() && listNotTestedNodes.back()->a_visited)
+            listNotTestedNodes.pop_back();
+
+        if (listNotTestedNodes.empty())
+            break;
+
+        current = listNotTestedNodes.back();
+        current->a_visited = true;
+
+        for (auto neighbor : current->neighborsAStar)
+        {
+            if (!neighbor->a_visited)
+                listNotTestedNodes.push_back(neighbor);
+
+            int possiblyLowerGoal = current->fLocalGoal + 1;
+
+            if (possiblyLowerGoal < neighbor->fLocalGoal)
+            {
+                neighbor->parent = current;
+                neighbor->fLocalGoal = possiblyLowerGoal;
+                neighbor->fGlobalGoal = neighbor->fLocalGoal + ManhattanDistance(neighbor->x, goal->x, neighbor->y, goal->y);
+            }
+        }
+    }
+}
+
+int Maze::ManhattanDistance(int x1, int x2, int y1, int y2)
+{
+    int distanceX = std::abs(x2 - x1);
+    int distanceY = std::abs(y2 - y1);
+    return distanceX + distanceY;
+}
+
+void Maze::sort(std::vector<Maze::Cell *> &listNotTestedNodes)
+{
+
+    Maze::Cell *aux = NULL;
+
+    bool swapped;
+
+    for (int i = 0; i < listNotTestedNodes.size() - 1; i++)
+    {
+        swapped = false;
+
+        for (int j = 0; j < listNotTestedNodes.size() - i - 1; j++)
+        {
+            if (listNotTestedNodes[j] < listNotTestedNodes[j + 1])
+            {
+                aux = listNotTestedNodes[j + 1];
+                listNotTestedNodes[j + 1] = listNotTestedNodes[j];
+                listNotTestedNodes[j] = aux;
+                swapped = true;
+            }
+        }
+
+        if (!swapped)
+        {
+            break;
+        }
     }
 }
