@@ -97,7 +97,6 @@ private:
     // Calcular la distancia Manhattan entre dos puntos
     int ManhattanDistance(int, int, int, int);
     // Ordenar Priority Queue
-    void sort(std::vector<Maze::Cell *> &);
 
 private:
     // Ventana donde corre toda la lógica

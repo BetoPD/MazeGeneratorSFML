@@ -330,32 +330,3 @@ int Maze::ManhattanDistance(int x1, int x2, int y1, int y2)
     int distanceY = std::abs(y2 - y1);
     return distanceX + distanceY;
 }
-
-void Maze::sort(std::vector<Maze::Cell *> &listNotTestedNodes)
-{
-
-    Maze::Cell *aux = NULL;
-
-    bool swapped;
-
-    for (int i = 0; i < listNotTestedNodes.size() - 1; i++)
-    {
-        swapped = false;
-
-        for (int j = 0; j < listNotTestedNodes.size() - i - 1; j++)
-        {
-            if (listNotTestedNodes[j] < listNotTestedNodes[j + 1])
-            {
-                aux = listNotTestedNodes[j + 1];
-                listNotTestedNodes[j + 1] = listNotTestedNodes[j];
-                listNotTestedNodes[j] = aux;
-                swapped = true;
-            }
-        }
-
-        if (!swapped)
-        {
-            break;
-        }
-    }
-}
