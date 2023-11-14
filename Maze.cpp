@@ -117,7 +117,7 @@ void Maze::Draw()
             }
             else
             {
-                myCells[y][x]->rectangle.setFillColor(sf::Color::Magenta);
+                myCells[y][x]->rectangle.setFillColor(sf::Color::White);
             }
 
             mWindow.draw(myCells[y][x]->rectangle);
@@ -172,6 +172,11 @@ void Maze::Draw()
         mWindow.draw(caminito->rectangle);
         caminito = caminito->parent;
     }
+
+    myCells[0][0]->rectangle.setFillColor(sf::Color::Red);
+    myCells[0][0]->SetDimentions(cellWidth / 4, cellHeight / 4);
+    myCells[0][0]->SetPosition(caminito->rectangle.getPosition().x + cellWidth / 2, caminito->rectangle.getPosition().y + cellHeight / 2);
+    mWindow.draw(myCells[0][0]->rectangle);
 }
 
 Maze::Cell *Maze::getRandomNeighbor(int x, int y)
