@@ -3,6 +3,8 @@
 #include <string>
 #include <map>
 #include <iostream>
+#include <stack>
+#include <vector>
 
 #define WIDTH 400
 #define HEIGHT 400
@@ -51,6 +53,8 @@ private:
     void update();
     void render();
     void Draw();
+    Cell *getRandomNeighbor(int, int);
+    void RemoveWalls(Maze::Cell *, Maze::Cell *, int, int);
 
 private:
     sf::RenderWindow mWindow;

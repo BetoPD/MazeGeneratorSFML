@@ -14,12 +14,15 @@ Maze::Maze(int Width, int Height)
 
     for (int i = 0; i < SIZE; i++)
     {
-        myCells[i] = new Cell *[10];
+        myCells[i] = new Cell *[SIZE];
         for (int j = 0; j < SIZE; j++)
         {
-            myCells[i][j] = new Cell;
+            myCells[i][j] = new Cell(j, i);
         }
     }
+
+    // Random Seed
+    std::srand(10);
 }
 
 void Maze::Run()
@@ -45,6 +48,37 @@ void Maze::processEvents()
 
 void Maze::update()
 {
+
+    int deltaX, deltaY;
+
+    std::stack<Maze::Cell *> pila;
+
+    Maze::Cell *current = myCells[0][0];
+    Maze::Cell *next = NULL;
+
+    current->visited = true;
+
+    pila.push(current);
+
+    while (!pila.empty())
+    {
+        next = getRandomNeighbor(current->x, current->y);
+
+        if (next != NULL)
+        {
+            deltaX = next->x - current->x;
+            deltaY = next->y - current->y;
+            next->visited = true;
+            RemoveWalls(current, next, deltaX, deltaY);
+            current = next;
+            pila.push(current);
+        }
+        else
+        {
+            current = pila.top();
+            pila.pop();
+        }
+    }
 }
 
 void Maze::render()
@@ -118,5 +152,86 @@ void Maze::Draw()
                 mWindow.draw(left);
             }
         }
+    }
+}
+
+Maze::Cell *Maze::getRandomNeighbor(int x, int y)
+{
+
+    std::vector<Maze::Cell *> neighbors;
+
+    if (y - 1 >= 0 && y - 1 < SIZE)
+    {
+        Maze::Cell *top = myCells[y - 1][x];
+
+        if (!top->visited)
+        {
+            neighbors.push_back(top);
+        }
+    }
+
+    if (y + 1 < SIZE && y + 1 >= 0)
+    {
+        Maze::Cell *bottom = myCells[y + 1][x];
+        if (!bottom->visited)
+        {
+            neighbors.push_back(bottom);
+        }
+    }
+
+    if (x + 1 < SIZE && x + 1 >= 0)
+    {
+        Maze::Cell *right = myCells[y][x + 1];
+        if (!right->visited)
+        {
+            neighbors.push_back(right);
+        }
+    }
+
+    if (x - 1 < SIZE && x - 1 >= 0)
+    {
+        Maze::Cell *left = myCells[y][x - 1];
+
+        if (!left->visited)
+        {
+            neighbors.push_back(left);
+        }
+    }
+
+    int random = 0 + (rand() % neighbors.size());
+
+    if (neighbors.size() > 0)
+    {
+        return neighbors[random];
+    }
+
+    return NULL;
+}
+
+void Maze::RemoveWalls(Maze::Cell *current, Maze::Cell *next, int deltaX, int deltaY)
+{
+    if (deltaX == -1)
+    {
+        current->neighbors["left"] = true;
+        next->neighbors["right"] = true;
+        return;
+    }
+    else if (deltaX == 1)
+    {
+        current->neighbors["right"] = true;
+        next->neighbors["left"] = true;
+        return;
+    }
+    else if (deltaY == -1)
+    {
+        current->neighbors["top"] = true;
+        next->neighbors["bottom"] = true;
+        return;
+    }
+    else
+    {
+        current->neighbors["bottom"] = true;
+        next->neighbors["top"] = true;
+        return;
     }
 }
