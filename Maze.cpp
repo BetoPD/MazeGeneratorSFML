@@ -22,7 +22,7 @@ Maze::Maze(int Width, int Height)
     }
 
     // Random Seed
-    std::srand(10);
+    std::srand(9);
 }
 
 void Maze::Run()
@@ -206,6 +206,19 @@ Maze::Cell *Maze::getRandomNeighbor(int x, int y)
     }
 
     return NULL;
+}
+
+void Maze::AStarAlgorith(Maze::Cell *start, Maze::Cell *goal)
+{
+    start->g_score = 0;
+    start->f_score = ManhattanDistance(start->x, goal->x, start->y, goal->y);
+}
+
+int Maze::ManhattanDistance(int x1, int x2, int y1, int y2)
+{
+    int distanceX = std::abs(x2 - x1);
+    int distanceY = std::abs(y2 - y1);
+    return distanceX + distanceY;
 }
 
 void Maze::RemoveWalls(Maze::Cell *current, Maze::Cell *next, int deltaX, int deltaY)

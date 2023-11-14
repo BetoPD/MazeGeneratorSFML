@@ -5,6 +5,7 @@
 #include <iostream>
 #include <stack>
 #include <vector>
+#include <limits>
 
 #define WIDTH 400
 #define HEIGHT 400
@@ -23,6 +24,8 @@ private:
         int x;
         int y;
         bool visited;
+        int g_score;
+        int f_score;
         std::map<std::string, bool> neighbors;
         sf::RectangleShape rectangle;
 
@@ -30,6 +33,8 @@ private:
         {
             x = X;
             y = Y;
+            g_score = std::numeric_limits<int>::max();
+            f_score = std::numeric_limits<int>::max();
             visited = false;
             neighbors["top"] = false;
             neighbors["bottom"] = false;
@@ -55,6 +60,8 @@ private:
     void Draw();
     Cell *getRandomNeighbor(int, int);
     void RemoveWalls(Maze::Cell *, Maze::Cell *, int, int);
+    void AStarAlgorith(Maze::Cell *, Maze::Cell *);
+    int ManhattanDistance(int, int, int, int);
 
 private:
     sf::RenderWindow mWindow;
