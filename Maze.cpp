@@ -13,12 +13,12 @@ Maze::Maze(int Width, int Height, int D, int seed)
     dificulty = D;
 
     // Llenando el vector de celdas
-    myCells = new Maze::Cell **[dificulty];
+    myCells = new Maze::Cell **[D];
 
-    for (int i = 0; i < dificulty; i++)
+    for (int i = 0; i < D; i++)
     {
-        myCells[i] = new Cell *[dificulty];
-        for (int j = 0; j < dificulty; j++)
+        myCells[i] = new Cell *[D];
+        for (int j = 0; j < D; j++)
         {
             myCells[i][j] = new Cell(j, i);
         }
