@@ -1,4 +1,5 @@
 #pragma once
+// Librería para las gráficas
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <map>
@@ -6,10 +7,6 @@
 #include <stack>
 #include <vector>
 #include <limits>
-
-// #define WIDTH 400
-// #define HEIGHT 400
-// #define SIZE 10
 
 class Maze
 {
@@ -107,4 +104,6 @@ private:
     int width, height;
     // Cantidad de "Cells" por laberinto
     int dificulty;
+    // Goal cell
+    Maze::Cell *goalCell;
 };

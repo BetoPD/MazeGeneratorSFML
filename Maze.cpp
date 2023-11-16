@@ -26,6 +26,9 @@ Maze::Maze(int Width, int Height, int D, int seed)
 
     // Random Seed
     std::srand(seed);
+
+    // Goal cell
+    goalCell = myCells[dificulty - 1][dificulty - 1];
 }
 
 void Maze::Run()
@@ -83,7 +86,7 @@ void Maze::update()
         }
     }
 
-    AStarAlgorithm(myCells[0][0], myCells[dificulty - 1][dificulty - 1]);
+    AStarAlgorithm(myCells[0][0], goalCell);
 }
 
 void Maze::render()
@@ -162,7 +165,7 @@ void Maze::Draw()
 
     // Dibujar el camino de A* Star
 
-    Maze::Cell *caminito = myCells[dificulty - 1][dificulty - 1];
+    Maze::Cell *caminito = goalCell;
 
     while (caminito->parent != NULL)
     {
@@ -317,7 +320,7 @@ void Maze::AStarAlgorithm(Maze::Cell *start, Maze::Cell *goal)
             if (!neighbor->a_visited)
                 listNotTestedNodes.push_back(neighbor);
 
-            int possiblyLowerGoal = current->fLocalGoal + 1;
+            int possiblyLowerGoal = current->fLocalGoal + ManhattanDistance(current->x, neighbor->x, current->y, neighbor->y);
 
             if (possiblyLowerGoal < neighbor->fLocalGoal)
             {
